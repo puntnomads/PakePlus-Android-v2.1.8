@@ -1,26 +1,26 @@
-console.log(
-    '%cbuild from PakePlus： https://github.com/Sjj1024/PakePlus',
-    'color:orangered;font-weight:bolder'
-)
+window.addEventListener("DOMContentLoaded",()=>{const t=document.createElement("script");t.src="https://www.googletagmanager.com/gtag/js?id=G-W5GKHM0893",t.async=!0,document.head.appendChild(t);const n=document.createElement("script");n.textContent="window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-W5GKHM0893');",document.body.appendChild(n)});let bannedUrlPaths = ["browse", "home", "chat", "explore"];
 
-// very important, if you don't know what it is, don't touch it
-// 非常重要，不懂代码不要动
-const hookClick = (e) => {
-    const origin = e.target.closest('a')
-    const isBaseTargetBlank = document.querySelector(
-        'head base[target="_blank"]'
-    )
-    console.log('origin', origin, isBaseTargetBlank)
-    if (
-        (origin && origin.href && origin.target === '_blank') ||
-        (origin && origin.href && isBaseTargetBlank)
-    ) {
-        e.preventDefault()
-        console.log('handle origin', origin)
-        location.href = origin.href
-    } else {
-        console.log('not handle origin', origin)
+const blockBannedSubStackPages = () => {
+  let currentUrl = window.location.href;
+  let isPathFound = bannedUrlPaths.some((bannedPath) =>
+    currentUrl.includes(bannedPath)
+  );
+  if (isPathFound) {
+    window.location.href = "https://substack.com/inbox";
+  }
+};
+
+const observeChange = () => {
+  let oldHref = document.location.href;
+  let body = document.querySelector("body");
+  let observer = new MutationObserver((mutations) => {
+    if (oldHref !== document.location.href) {
+      oldHref = document.location.href;
+      blockBannedSubStackPages();
     }
-}
+  });
+  observer.observe(body, { childList: true, subtree: true });
+  blockBannedSubStackPages();
+};
 
-document.addEventListener('click', hookClick, { capture: true })
+window.onload = observeChange;
